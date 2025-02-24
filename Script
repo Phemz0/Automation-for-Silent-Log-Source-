@@ -2,11 +2,11 @@ import pandas as pd
 from datetime import datetime, timedelta
 
 input_files = [
-    r".csv", # place ur source files here (need to be csv) also if file path contains \'s please escape them 
-    r".csv",
-    r".csv"
+    r"All Other.csv",
+    r"Windows Hosts.csv",
+    r"Windows (Domains).csv"
 ]
-output_file = r".txt"
+output_file = r"yes.txt"
 
 current_time = datetime.now()
 time_window_start = current_time - timedelta(hours=48)
@@ -14,23 +14,30 @@ time_window_start = current_time - timedelta(hours=48)
 with open(output_file, 'w') as f:
     for input_file in input_files:
         df = pd.read_csv(input_file)
-        df.columns = df.columns.str.strip()
-
+        df.columns = df.columns.str.strip()  
+        
         if 'All Other' in input_file:
             timestamp_column = 'metadata.ingested_timestamp (max) Time'
             hostname_column = 'principal.hostname' 
             logtype_column = 'metadata.log_type'
-        elif 'WindowsHosts' in input_file:
+        elif 'Windows Hosts' in input_file:  # Fixed typo from 'WindowsHosts'
             timestamp_column = 'metadata.ingested_timestamp (max) Time'
-            hostname_column = 'principal.hostname'
+            hostname_column = 'observer.hostname'
             logtype_column = 'metadata.log_type'
         elif 'Windows (Domains)' in input_file:
             timestamp_column = 'metadata.ingested_timestamp (max) Time'
-            hostname_column = 'principal.hostname'
+            hostname_column = 'principal.administrative_domain'
             logtype_column = 'metadata.log_type'
 
-        print(f"Columns in {input_file}: {df.columns}")
+        print(f"Columns in {input_file}: {df.columns.tolist()}")  #debug
         
+        if hostname_column not in df.columns:
+            print(f"Error: Column '{hostname_column}' not found in {input_file}. Skipping this file.")
+            continue
+        if timestamp_column not in df.columns:
+            print(f"Error: Column '{timestamp_column}' not found in {input_file}. Skipping this file.")
+            continue
+
         df[timestamp_column] = pd.to_datetime(df[timestamp_column], errors='coerce', dayfirst=True)
         df_filtered = df[df[timestamp_column] < time_window_start]
         
