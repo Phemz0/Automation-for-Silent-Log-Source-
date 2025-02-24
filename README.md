@@ -7,7 +7,7 @@ Create a New Folder
 
 Download Files from Dashboard 
 
-	Download all necessary files from the customer dashboard. (All Other.csv, Windows (Domains).csv and Windows Hosts.csv)
+	Download all necessary files from the customer dashboard (They need to be csv files). (All Other.csv, Windows (Domains).csv and Windows Hosts.csv)
 	Ensure that file names are unique—for example, Allstuff.csv is fine, but Allstuff (1).csv will not work. 	Rename any duplicates if needed.
 
 Move CSV Files
