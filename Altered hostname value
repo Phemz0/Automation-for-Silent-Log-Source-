@@ -1,0 +1,36 @@
+import pandas as pd
+from datetime import datetime, timedelta
+
+input_file = r".csv"
+output_file = r".txt"
+
+df = pd.read_csv(input_file)
+
+timestamp_column = 'metadata.ingested_timestamp (max) Time' # Change value based on the file
+
+df[timestamp_column] = pd.to_datetime(df[timestamp_column], errors='coerce', dayfirst=True)
+
+invalid_rows = df[df[timestamp_column].isna()]
+print(f"Rows with invalid timestamps:\n{invalid_rows}")
+
+current_time = datetime.now()
+time_window_start = current_time - timedelta(hours=48)
+
+print(f"Current time: {current_time}")
+print(f"Filtering for records older than: {time_window_start}")
+
+df_filtered = df[df[timestamp_column] < time_window_start]
+
+df_filtered = df_filtered[['principal.hostname', timestamp_column]] # Change value based on the file
+
+df_filtered['Formatted Output'] = df_filtered.apply(
+    lambda row: f"{row['principal.hostname']}, Last Logged: {row[timestamp_column].strftime('%Y-%m-%d %H:%M:%S')}", axis=1 # Change value based on the file (hostname)
+)
+
+print(f"Rows after filtering by timestamp: {len(df_filtered)}")
+
+with open(output_file, 'w') as f:
+    for line in df_filtered['Formatted Output']:
+        f.write(f"{line}\n")
+
+print(f"Filtered data saved to {output_file}")
