@@ -5,9 +5,9 @@ Create a New Folder
 	Move the Script
 	Drag and drop the script into the folder you just created.
 
-Download Files from Almac
+Download Files from Dashboard 
 
-	Download all necessary files from the Almac dashboard. (All Other.csv, Windows (Domains).csv and Windows Hosts.csv)
+	Download all necessary files from the customer dashboard. (All Other.csv, Windows (Domains).csv and Windows Hosts.csv)
 	Ensure that file names are unique—for example, Allstuff.csv is fine, but Allstuff (1).csv will not work. 	Rename any duplicates if needed.
 
 Move CSV Files
