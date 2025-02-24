@@ -1,36 +1,53 @@
 import pandas as pd
 from datetime import datetime, timedelta
 
-input_file = r"csv file"
-output_file = r"txt file"
-
-df = pd.read_csv(input_file)
-
-timestamp_column = 'metadata.ingested_timestamp (max) Time'
-
-df[timestamp_column] = pd.to_datetime(df[timestamp_column], errors='coerce', dayfirst=True)
-
-invalid_rows = df[df[timestamp_column].isna()]
-print(f"Rows with invalid timestamps:\n{invalid_rows}")
+input_files = [
+    r".csv", # place ur source files here (need to be csv) also if file path contains \'s please escape them 
+    r".csv",
+    r".csv"
+]
+output_file = r".txt"
 
 current_time = datetime.now()
 time_window_start = current_time - timedelta(hours=48)
 
-print(f"Current time: {current_time}")
-print(f"Filtering for records older than: {time_window_start}")
-
-df_filtered = df[df[timestamp_column] < time_window_start]
-
-df_filtered = df_filtered[['observer.hostname', timestamp_column]]
-
-df_filtered['Formatted Output'] = df_filtered.apply(
-    lambda row: f"{row['observer.hostname']}, Last Logged: {row[timestamp_column].strftime('%Y-%m-%d %H:%M:%S')}", axis=1
-)
-
-print(f"Rows after filtering by timestamp: {len(df_filtered)}")
-
 with open(output_file, 'w') as f:
-    for line in df_filtered['Formatted Output']:
-        f.write(f"{line}\n")
+    for input_file in input_files:
+        df = pd.read_csv(input_file)
+        df.columns = df.columns.str.strip()
 
-print(f"Filtered data saved to {output_file}")
+        if 'All Other' in input_file:
+            timestamp_column = 'metadata.ingested_timestamp (max) Time'
+            hostname_column = 'principal.hostname' 
+            logtype_column = 'metadata.log_type'
+        elif 'WindowsHosts' in input_file:
+            timestamp_column = 'metadata.ingested_timestamp (max) Time'
+            hostname_column = 'principal.hostname'
+            logtype_column = 'metadata.log_type'
+        elif 'Windows (Domains)' in input_file:
+            timestamp_column = 'metadata.ingested_timestamp (max) Time'
+            hostname_column = 'principal.hostname'
+            logtype_column = 'metadata.log_type'
+
+        print(f"Columns in {input_file}: {df.columns}")
+        
+        df[timestamp_column] = pd.to_datetime(df[timestamp_column], errors='coerce', dayfirst=True)
+        df_filtered = df[df[timestamp_column] < time_window_start]
+        
+        if logtype_column in df.columns:
+            df_filtered = df_filtered[[hostname_column, timestamp_column, logtype_column]]
+        else:
+            print(f"Column '{logtype_column}' not found in {input_file}. Skipping logtype column.")
+            df_filtered = df_filtered[[hostname_column, timestamp_column]]
+        
+        df_filtered['Formatted Output'] = df_filtered.apply(
+            lambda row: f"{row[logtype_column] if logtype_column in df.columns else ''} - {row[hostname_column]}, Last Logged: {row[timestamp_column].strftime('%Y-%m-%d %H:%M:%S')}", axis=1
+        )
+
+        f.write(f"\n-------------------\n")
+        for line in df_filtered['Formatted Output']:
+            f.write(f"{line}\n")
+
+        print(f"Filtered data for {input_file} saved to {output_file}")
+
+print(f"Data has been filtered and saved to: {output_file}")
