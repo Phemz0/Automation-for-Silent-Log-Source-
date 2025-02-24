@@ -20,7 +20,7 @@ with open(output_file, 'w') as f:
             timestamp_column = 'metadata.ingested_timestamp (max) Time'
             hostname_column = 'principal.hostname' 
             logtype_column = 'metadata.log_type'
-        elif 'Windows Hosts' in input_file:  # Fixed typo from 'WindowsHosts'
+        elif 'Windows Hosts' in input_file:  
             timestamp_column = 'metadata.ingested_timestamp (max) Time'
             hostname_column = 'observer.hostname'
             logtype_column = 'metadata.log_type'
@@ -29,7 +29,7 @@ with open(output_file, 'w') as f:
             hostname_column = 'principal.administrative_domain'
             logtype_column = 'metadata.log_type'
 
-        print(f"Columns in {input_file}: {df.columns.tolist()}")  #debug
+        print(f"Columns in {input_file}: {df.columns.tolist()}")  # Debug
         
         if hostname_column not in df.columns:
             print(f"Error: Column '{hostname_column}' not found in {input_file}. Skipping this file.")
@@ -48,10 +48,12 @@ with open(output_file, 'w') as f:
             df_filtered = df_filtered[[hostname_column, timestamp_column]]
         
         df_filtered['Formatted Output'] = df_filtered.apply(
-            lambda row: f"{row[logtype_column] if logtype_column in df.columns else ''} - {row[hostname_column]}, Last Logged: {row[timestamp_column].strftime('%Y-%m-%d %H:%M:%S')}", axis=1
+            lambda row: f"{row[logtype_column] if logtype_column in df.columns else ''} - {row[hostname_column]}, Last Logged: {row[timestamp_column].strftime('%Y-%m-%d %H:%M:%S')}", 
+            axis=1
         )
 
-        f.write(f"\n-------------------\n")
+        f.write(f"\n=== {input_file} ===\n")  # File name at the top of each section
+        f.write(f"-------------------\n")
         for line in df_filtered['Formatted Output']:
             f.write(f"{line}\n")
 
