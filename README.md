@@ -22,6 +22,6 @@ Install Pandas
 
 Run the Script
 
-	Type: 'python3 *filename*'
+	Type: 'python3 filename'
 	Press the Tab key to auto-fill the script name, then press Enter.
 	If everything works correctly, a new text file named "yes.txt" should appear in the folder.
